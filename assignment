@@ -59,3 +59,38 @@ fourth_word=uni_counter['ናት']/total_length
 
 sentence_probablity=first_word*second_word*third_word*fourth_word
 sentence_probablity
+
+
+
+
+
+######Generate random sentences using n-grams
+
+######As n increases, sentences tend to be more contextualy appropriate and meaning full , but they might also become more repetitive
+
+
+import random
+
+def generate_random_sentence(ngram_counter, length=5):
+    sentence = []
+    first_ngram = random.choice(list(ngram_counter.keys()))
+
+    for _ in range(length):
+        sentence.extend(first_ngram)
+        next_ngram_options = [gram for gram in ngram_counter if gram[0] == first_ngram[-1]]
+        if next_ngram_options:
+            first_ngram = random.choice(next_ngram_options)
+        else:
+            break
+
+
+    final_sentence = " ".join([word for bigram in sentence for word in bigram])
+
+    return final_sentence
+
+rand_sentence = generate_random_sentence(bigram_counter)
+print(rand_sentence)
+
+
+
+
