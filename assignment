@@ -1,2 +1,35 @@
 from google.colab import drive
 drive.mount("/content/drive")
+
+import spacy
+from collections import Counter
+
+nlp = spacy.load("en_core_web_sm")
+nlp.max_length = 500000000
+
+
+def extract_ngrams(doc, n):
+    ngrams = []
+    for i in range(len(doc) - n + 1):
+        ngram = " ".join([token.text for token in doc[i:i + n]])
+        ngrams.append(ngram)
+    return ngrams
+
+unigram = []
+bigram = []
+trigram = []
+fourgram = []
+
+with open("/content/drive/MyDrive/Colab Notebooks/GPAC.txt", 'r', encoding="utf-8", errors="ignore") as file:
+    for chunk in iter(lambda: file.read(4096), ''):
+        data = nlp(chunk)
+
+        unigram.extend(extract_ngrams(data, 1))
+        bigram.extend(extract_ngrams(data, 2))
+        trigram.extend(extract_ngrams(data, 3))
+        fourgram.extend(extract_ngrams(data, 4))
+
+uni_counter = Counter(unigram)
+bigram_counter = Counter(bigram)
+trigram_counter = Counter(trigram)
+fourgram_counter = Counter(fourgram)
