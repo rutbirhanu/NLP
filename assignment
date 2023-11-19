@@ -94,3 +94,23 @@ print(rand_sentence)
 
 
 
+#####Evaluate these Language Models Using Intrinsic Evaluation Method
+
+#######for the intrinsic evaluation i am calculating perplexity for each ngrams
+
+vocabulary_size = len(set(unigram))
+
+def calculate_perplexity(ngram_counter, ngram, vocabulary_size):
+    total_token = len(ngram) 
+
+    smoothed_probability = {token: (count + 1) / (ngram_counter[token] + vocabulary_size) for token, count in ngram_counter.items()}
+
+    total_probability = 1
+    for token in ngram:
+        total_probability *= smoothed_probability[token]
+
+    if total_token > 0:
+        perplexity = (1 / total_probability) ** (1 / total_token)
+        return perplexity
+    else:
+        return None
