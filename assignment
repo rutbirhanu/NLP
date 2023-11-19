@@ -33,3 +33,13 @@ uni_counter = Counter(unigram)
 bigram_counter = Counter(bigram)
 trigram_counter = Counter(trigram)
 fourgram_counter = Counter(fourgram)
+
+#Calculate probabilities of n-grams and find the top 10 most likely n-grams for all n
+
+def ngram_probability(ngram_counter):
+    total_length = sum(ngram_counter.values())
+    ngram_probability = {token: count / total_length for token, count in ngram_counter.items()}
+    sorted_ngrams = sorted(ngram_probability.items(), key=lambda x: x[1], reverse=True)
+    return sorted_ngrams[:10]
+
+bigram_probability=ngram_probability(bigram_counter)
