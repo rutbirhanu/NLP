@@ -114,3 +114,26 @@ def calculate_perplexity(ngram_counter, ngram, vocabulary_size):
         return perplexity
     else:
         return None
+
+
+
+
+######Evaluate these Language Models Using Extrinsic Evaluation Method
+
+#######by writing function to predict the next word and seeing how it performs
+
+def predict_next_word(word, bigram_frequency):
+    next_word_options = [next_word for (current_word, next_word), freq in bigram_frequency.items() if current_word == word]
+    return random.choice(next_word_options) if next_word_options else None
+
+sentence = ['ኢትዮጵያ']
+for _ in range(5): 
+    current_word = sentence[-1]
+    next_word = predict_next_word(current_word, bigram_counter)
+    if next_word:
+        sentence.append(next_word)
+    else:
+        break
+
+generated_sentence = " ".join(sentence)
+generated_sentence
