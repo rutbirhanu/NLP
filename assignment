@@ -34,7 +34,9 @@ bigram_counter = Counter(bigram)
 trigram_counter = Counter(trigram)
 fourgram_counter = Counter(fourgram)
 
-#Calculate probabilities of n-grams and find the top 10 most likely n-grams for all n
+
+
+####Calculate probabilities of n-grams and find the top 10 most likely n-grams for all n
 
 def ngram_probability(ngram_counter):
     total_length = sum(ngram_counter.values())
@@ -43,3 +45,17 @@ def ngram_probability(ngram_counter):
     return sorted_ngrams[:10]
 
 bigram_probability=ngram_probability(bigram_counter)
+
+
+
+
+##### What is the probability of the sentence. "ኢትዮጵያ ታሪካዊ ሀገር ናት "
+
+total_length=sum(uni_counter.values())
+first_word=uni_counter['ኢትዮጵያ']/total_length 
+second_word=uni_counter['ታሪካዊ']/total_length 
+third_word=uni_counter['ሀገር']/total_length 
+fourth_word=uni_counter['ናት']/total_length 
+
+sentence_probablity=first_word*second_word*third_word*fourth_word
+sentence_probablity
