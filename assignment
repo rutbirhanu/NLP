@@ -36,6 +36,8 @@ fourgram_counter = Counter(fourgram)
 
 
 
+
+
 ####Calculate probabilities of n-grams and find the top 10 most likely n-grams for all n
 
 def ngram_probability(ngram_counter):
@@ -45,6 +47,7 @@ def ngram_probability(ngram_counter):
     return sorted_ngrams[:10]
 
 bigram_probability=ngram_probability(bigram_counter)
+
 
 
 
@@ -59,6 +62,7 @@ fourth_word=uni_counter['ናት']/total_length
 
 sentence_probablity=first_word*second_word*third_word*fourth_word
 sentence_probablity
+
 
 
 
@@ -94,6 +98,7 @@ print(rand_sentence)
 
 
 
+
 #####Evaluate these Language Models Using Intrinsic Evaluation Method
 
 #######for the intrinsic evaluation i am calculating perplexity for each ngrams
@@ -114,6 +119,7 @@ def calculate_perplexity(ngram_counter, ngram, vocabulary_size):
         return perplexity
     else:
         return None
+
 
 
 
