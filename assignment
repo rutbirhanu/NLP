@@ -4,15 +4,15 @@ drive.mount("/content/drive")
 import spacy
 from collections import Counter
 
-nlp = spacy.load("en_core_web_sm")
-nlp.max_length = 500000000
-
-
-def extract_ngrams(doc, n):
+def remove_punctuation_custom(text):
+    amharic_punctuation = "፡።፣፤፥፦፧፡።፣፤፥፦?"
+    cleaned_text = ''.join(char for char in text if char not in amharic_punctuation)
+    return cleaned_text
+  
+def extract_ngrams(corpus, n):
     ngrams = []
-    for i in range(len(doc) - n + 1):
-        ngram = " ".join([token.text for token in doc[i:i + n]])
-        ngrams.append(ngram)
+    doc=corpus.split()
+    ngrams =[" ".join(doc[i:i + n]) for i in range(len(doc) - n + 1)]
     return ngrams
 
 unigram = []
@@ -21,20 +21,23 @@ trigram = []
 fourgram = []
 
 with open("/content/drive/MyDrive/Colab Notebooks/GPAC.txt", 'r', encoding="utf-8", errors="ignore") as file:
-    for chunk in iter(lambda: file.read(4096), ''):
-        data = nlp(chunk)
-
-        unigram.extend(extract_ngrams(data, 1))
-        bigram.extend(extract_ngrams(data, 2))
-        trigram.extend(extract_ngrams(data, 3))
-        fourgram.extend(extract_ngrams(data, 4))
+    chunk=file.read(5000)      
+    data = remove_punctuation_custom(chunk)
+    unigram.extend(extract_ngrams(data, 1))
+    bigram.extend(extract_ngrams(data, 2))
+    trigram.extend(extract_ngrams(data, 3))
+    fourgram.extend(extract_ngrams(data, 4))
 
 uni_counter = Counter(unigram)
 bigram_counter = Counter(bigram)
 trigram_counter = Counter(trigram)
 fourgram_counter = Counter(fourgram)
 
-
+print(unigram[:10])
+print()
+print(bigram[:10])
+print()
+print(trigram[:10])
 
 
 
@@ -47,25 +50,39 @@ def ngram_probability(ngram_counter):
     return sorted_ngrams[:10]
 
 bigram_probability=ngram_probability(bigram_counter)
+unigram_probability=ngram_probability(uni_counter)
 
-
-
+print(unigram_probability)
+print()
+print(bigram_probability)
 
 
 ##### What is the probability of the sentence. "ኢትዮጵያ ታሪካዊ ሀገር ናት "
 
-total_length=sum(uni_counter.values())
-first_word=uni_counter['ኢትዮጵያ']/total_length 
-second_word=uni_counter['ታሪካዊ']/total_length 
-third_word=uni_counter['ሀገር']/total_length 
-fourth_word=uni_counter['ናት']/total_length 
+def calculate_sentence_probability(sentence, ngram_counter, n):
+    words = remove_punctuation_custom(sentence).split()
+    ngrams = extract_ngrams(words, n)
 
-sentence_probablity=first_word*second_word*third_word*fourth_word
-sentence_probablity
+    sentence_probability = 1.0
+    for i in range(len(ngrams) - 1):  
+        current_ngram = " ".join(ngrams[i:i + n])
 
+        if current_ngram in ngram_counter:
+            conditional_probability = ngram_counter[current_ngram] / sum(ngram_counter.values())
+        else:
+            conditional_probability = 0.0
 
+        sentence_probability *= conditional_probability
 
+    return sentence_probability
 
+example_sentence = "ኢትዮጵያ ታሪካዊ ሀገር ናት"
+
+bigram_probability = calculate_sentence_probability(example_sentence, bigram_counter, 2)
+trigram_probability = calculate_sentence_probability(example_sentence, trigram_counter, 3)
+
+print(f"Bigram Probability of the sentence '{example_sentence}': {bigram_probability}")
+print(f"Trigram Probability of the sentence '{example_sentence}': {trigram_probability}")
 
 
 ######Generate random sentences using n-grams
