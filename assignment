@@ -92,26 +92,29 @@ print(f"Trigram Probability of the sentence '{example_sentence}': {trigram_proba
 
 import random
 
-def generate_random_sentence(ngram_counter, length=5):
+def generate_random_sentence(ngram_counter, n):
     sentence = []
-    first_ngram = random.choice(list(ngram_counter.keys()))
 
-    for _ in range(length):
-        sentence.extend(first_ngram)
-        next_ngram_options = [gram for gram in ngram_counter if gram[0] == first_ngram[-1]]
-        if next_ngram_options:
-            first_ngram = random.choice(next_ngram_options)
+    for i in range(5):
+        if n == 1:
+            next_word = random.choice(list(ngram_counter.keys()))
         else:
-            break
+            last_ngram = " ".join(sentence[-(n-1):])
+            possible_next_words = [word.split()[-1] for word in ngram_counter.keys() if word.startswith(last_ngram)]
+            next_word = random.choice(possible_next_words) if possible_next_words else random.choice(list(ngram_counter.keys()))
+
+        sentence.append(next_word)
+
+    return " ".join(sentence)
+
+random_unigram_sentence = generate_random_sentence(uni_counter, 1)
+random_bigram_sentence = generate_random_sentence(bigram_counter, 2)
+random_trigram_sentence = generate_random_sentence(trigram_counter, 3)
+random_fourgram_sentence = generate_random_sentence(fourgram_counter, 4)
 
 
-    final_sentence = " ".join([word for bigram in sentence for word in bigram])
-
-    return final_sentence
-
-rand_sentence = generate_random_sentence(bigram_counter)
-print(rand_sentence)
-
+print(f"Bigram Sentence: {random_bigram_sentence}")
+print(f"Trigram Sentence: {random_trigram_sentence}")
 
 
 
@@ -120,24 +123,30 @@ print(rand_sentence)
 
 #######for the intrinsic evaluation i am calculating perplexity for each ngrams
 
-vocabulary_size = len(set(unigram))
 
-def calculate_perplexity(ngram_counter, ngram, vocabulary_size):
-    total_token = len(ngram) 
+import math
 
-    smoothed_probability = {token: (count + 1) / (ngram_counter[token] + vocabulary_size) for token, count in ngram_counter.items()}
+def calculate_perplexity(test_set, ngram_counters, k=1):
+    N = sum(len(sentence.split()) for sentence in test_set)
+    perplexities = []
 
-    total_probability = 1
-    for token in ngram:
-        total_probability *= smoothed_probability[token]
+    for n, counter in enumerate(ngram_counters, start=1):
+        total_log_likelihood = 0
 
-    if total_token > 0:
-        perplexity = (1 / total_probability) ** (1 / total_token)
-        return perplexity
-    else:
-        return None
+        for sentence in test_set:
+            ngrams = extract_ngrams(sentence, n)
+            for ngram in ngrams:
+                probability = (counter[ngram] + k) / (sum(counter.values()) + len(counter))
+                total_log_likelihood += math.log(probability)
 
+        perplexity = math.exp(-(total_log_likelihood / N))
+        perplexities.append(perplexity)
+        print(f"Perplexity for n={n}: {perplexity}")
 
+    return perplexities
+
+test_set = ["ኢትዮጵያ ታሪካዊ ሀገር ናት", "ሰላም እንደ ገና ሆኖ አነስተኛ እንደ ሆነ ነው", "በሺህ አመታት በተከታታይ ስታዘጋጅ የኖረች","የአለም የእግር ኳስ" ]
+perplexities = calculate_perplexity(test_set, [uni_counter, bigram_counter, trigram_counter, fourgram_counter], k=1)
 
 
 
